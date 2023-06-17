@@ -7,7 +7,7 @@ from langchain import PromptTemplate
 from langchain.chain import LLMChain
 from langchain.llms import OpenAI
 
-load_dotenv()
+# load_dotenv()
 
 st.title('Be Tweet Smart')
 with st.form(key='my_form'):
