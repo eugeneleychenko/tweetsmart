@@ -1,5 +1,9 @@
 import requests
 import json
+import streamlit as st
+
+st.title('Be Tweet Smart')
+st.text_input('Enter Tweet ID')
 
 def get_full_text(json_data):
     full_text_list = []
