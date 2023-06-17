@@ -1,6 +1,13 @@
 import requests
 import json
 import streamlit as st
+import os
+from dotenv import load_dotenv
+from langchain import PromptTemplate
+from langchain.chain import LLMChain
+from langchain.llms import OpenAI
+
+load_dotenv()
 
 st.title('Be Tweet Smart')
 with st.form(key='my_form'):
