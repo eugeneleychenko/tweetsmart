@@ -27,4 +27,4 @@ headers = {
 response = requests.get(url, headers=headers, params=querystring)
 response_json = response.json()
 full_text_values = get_full_text(response_json)
-st.text(full_text_values)
+st.write(full_text_values)
