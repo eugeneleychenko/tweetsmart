@@ -2,7 +2,7 @@ import requests
 import json
 import streamlit as st
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from langchain import PromptTemplate
 from langchain.chain import LLMChain
 from langchain.llms import OpenAI
