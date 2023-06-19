@@ -2,7 +2,7 @@ from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import CharacterTextSplitter
 import os
-import openai
+# import openai
 from dotenv import find_dotenv, load_dotenv
 import requests
 import json
