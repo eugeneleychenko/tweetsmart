@@ -56,7 +56,7 @@ def main():
         # data = tweet_summary(urls)
         # summaries = search(data)
         # summaries1 = find_best_article_urls(summaries)
-        # summaries2 = get_content_from_urls(summaries1)
+        
 
         with st.expander("Fetched Tweet"):
             st.json(search_results)
