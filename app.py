@@ -11,6 +11,7 @@ import streamlit as st
 load_dotenv(find_dotenv())
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
+X_RAPIDAPI_KEY = os.getenv("X-RAPIDAPI-KEY")
 
 openai_api_key = OPENAI_API_KEY
 
@@ -23,7 +24,7 @@ def fetch_tweet(tweet):
     querystring = {"tweet_id": tweetid}
 
     headers = {
-        "X-RapidAPI-Key": "iPxYj0SjxxHJproXNwsgNGBx5rj3yf3a",
+        "X-RapidAPI-Key": X_RAPIDAPI_KEY,
         "X-RapidAPI-Host": "twitter154.p.rapidapi.com"
     }
 
@@ -136,7 +137,7 @@ def summarise(data, query):
     You are a world class journalist, and you will try to summarise the text above in order to create a research report about {query}
     Please follow all of the following rules:
     1/ Make sure the content is engaging, informative with good data.
-    2/ Make sure the content is not too long, it should be no more than 3-5 paragraphs
+    2/ Make sure the content is not too long, it should be no more than 10 BULLET points
     3/ The content should address the {query} topic very well
     4/ The audience will be filled with people that are capable so include actionable advice.
     5/ The content needs to be written in a way that is easy to read and understand
@@ -195,7 +196,7 @@ def main():
         with st.expander("Best Articles"):
             st.write(articles)  
         with st.expander("Write up"):
-            st.markdown(summary)      
+            st.info(summary)      
 
 
 if __name__ == '__main__':
