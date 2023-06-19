@@ -37,6 +37,8 @@ def fetch_tweet(tweet):
 
     return text_values
 
+
+# A lot has been borrowed from https://github.com/JayZeeDesign/autonomous-researcher/blob/main/app.py
 # summarize thread into a Google search query
 
 def convert_to_search_query(text_values):
@@ -117,14 +119,53 @@ def find_best_article_urls(response_data, query):
 
 
 # get content for each article from urls and make summary
+def get_content_from_urls(url_list):   
+    # use unstructuredURLLoader
+    loader = UnstructuredURLLoader(urls=url_list)
+    data = loader.load()
+
+    return data
+
+def summarise(data, query):
+    text_splitter = CharacterTextSplitter(separator="\n", chunk_size=3000, chunk_overlap=200, length_function=len)
+    text = text_splitter.split_documents(data)    
+
+    llm = OpenAI(model_name="gpt-3.5-turbo-16k", temperature=.7)
+    template = """
+    {text}
+    You are a world class journalist, and you will try to summarise the text above in order to create a research report about {query}
+    Please follow all of the following rules:
+    1/ Make sure the content is engaging, informative with good data.
+    2/ Make sure the content is not too long, it should be no more than 3-5 paragraphs
+    3/ The content should address the {query} topic very well
+    4/ The audience will be filled with people that are capable so include actionable advice.
+    5/ The content needs to be written in a way that is easy to read and understand
+    6/ The content needs to give audience actionable advice & insights too
+
+    SUMMARY:
+    """
+
+    prompt_template = PromptTemplate(input_variables=["text", "query"], template=template)
+
+    summariser_chain = LLMChain(llm=llm, prompt=prompt_template, verbose=True)
+
+    summaries = []
+
+    for chunk in enumerate(text):
+        summary = summariser_chain.predict(text=chunk, query=query)
+        summaries.append(summary)
+
+    print(summaries)
+    return summaries
 
 
 
+# main
 def main():
     load_dotenv(find_dotenv())
 
-    st.set_page_config(page_title="Tweet Smarts", page_icon=":bird:")
-    st.header("Dive deeper on those smart tweets  :brain:")
+    
+    st.header("Dive Deeper on Those Smart :bird: Tweets  :brain:")
 
     # st.header("Get More Context Around a Tweet")
     tweet = st.text_input("Enter the Tweet ID")
@@ -140,6 +181,8 @@ def main():
         query_to_search = convert_to_search_query(search_results)
         results = search(query_to_search)
         articles = find_best_article_urls(results, query_to_search)
+        data = get_content_from_urls(articles)
+        summary = summarise(data, query_to_search)
       
         
 
@@ -150,7 +193,9 @@ def main():
         with st.expander("Google Search results"):
             st.json(results) 
         with st.expander("Best Articles"):
-            st.write(articles)     
+            st.write(articles)  
+        with st.expander("Write up"):
+            st.markdown(summary)      
 
 
 if __name__ == '__main__':
