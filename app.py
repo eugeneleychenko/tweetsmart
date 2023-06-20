@@ -2,11 +2,12 @@ from langchain import OpenAI, LLMChain, PromptTemplate
 from langchain.document_loaders import UnstructuredURLLoader
 from langchain.text_splitter import CharacterTextSplitter
 import os
-# import openai
+import openai
 from dotenv import find_dotenv, load_dotenv
 import requests
 import json
 import streamlit as st
+import magic
 
 load_dotenv(find_dotenv())
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -49,10 +50,10 @@ def convert_to_search_query(text_values):
     # create llm to choose best articles
     llm = OpenAI(model_name="gpt-3.5-turbo", temperature=.7)
     template = """
-    You are a world class journalist & researcher, you are extremely good at finding most relevant articles to certain topic;
+    You are a world class journalist & researcher, you are extremely good at finding most relevant articles to certain topic:
     {response_str}
     
-    Please compose the most concise Google search query to get more information on this topic. Return ONLY the Google Search query, do not include anything else.
+    Please compose the most concise Google search query to get most information on this topic. Return ONLY the Google Search query, do not include anything else.
     """
 
     prompt_template = PromptTemplate(
@@ -138,6 +139,7 @@ def summarise(data, query):
     Please follow all of the following rules:
     1/ Make sure the content is engaging, informative with good data.
     2/ Make sure the content is not too long, it should be no more than 10 BULLET points
+    1/ Respond in html format
     3/ The content should address the {query} topic very well
     4/ The audience will be filled with people that are capable so include actionable advice.
     5/ The content needs to be written in a way that is easy to read and understand
@@ -158,6 +160,20 @@ def summarise(data, query):
 
     print(summaries)
     return summaries
+
+# def format_bullets(summaries):
+#   output = "h1: " + summaries[0] + "\n\n"
+#   for line in summaries[1:]:
+#     output += line + "\n"
+#   return output
+
+def format_bullets(summaries):
+    if isinstance(summaries):
+        # Add horizontal rules between pages
+        summaries = "\n<hr/>\n".join(summaries)
+        output= "".join([f"<p>{line}</p>" for line in summaries.split("\n")])
+    return output
+
 
 
 
@@ -184,6 +200,7 @@ def main():
         articles = find_best_article_urls(results, query_to_search)
         data = get_content_from_urls(articles)
         summary = summarise(data, query_to_search)
+        bullets = format_bullets(summary)
       
         
 
@@ -195,8 +212,11 @@ def main():
             st.json(results) 
         with st.expander("Best Articles"):
             st.write(articles)  
+        with st.exception("Data from Articles"):
+            st.write(data)            
         with st.expander("Write up"):
-            st.info(summary)      
+            st.markdown(bullets) 
+            # st.markdown(f"<p>{bullets}</p>", unsafe_allow_html=True)     
 
 
 if __name__ == '__main__':
